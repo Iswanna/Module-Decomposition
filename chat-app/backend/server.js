@@ -32,6 +32,10 @@ messages.push(newMessage);
 // Send back a success status and the message (the response)
 res.status(201).send(newMessage);
 
+app.get("/messages", (req, res) => {
+  res.send(messages);
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Chat app listening on port ${port}`);
