@@ -34,24 +34,31 @@ formElement.addEventListener("submit", async (event) => {
   const senderValue = senderElement.value;
   const messageValue = messageElement.value;
 
-  // Send the data
-  const response = await fetch("https://iswanna-chat-app-backend.onrender.com/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sender: senderValue,
-      text: messageValue,
-    }),
-  });
+  try {
+    // Send the data
+    const response = await fetch(
+      "https://iswanna-chat-app-backend.onrender.com/messages",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sender: senderValue,
+          text: messageValue,
+        }),
+      },
+    );
 
-  if (response.ok) {
-    // refresh the list of messages
-    getAllMessages();
+    if (response.ok) {
+      // refresh the list of messages
+      getAllMessages();
 
-    // clear the sender and message input values
-    senderElement.value = "";
-    messageElement.value = "";
+      // clear the sender and message input values
+      senderElement.value = "";
+      messageElement.value = "";
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
   }
 });
