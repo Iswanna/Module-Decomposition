@@ -36,7 +36,20 @@ app.post("/messages", (req, res) => {
   res.status(201).send(newMessage);
 });
 app.get("/messages", (req, res) => {
-  res.send(messages);
+  const sinceValue = req.query.since;
+
+  let sinceId;
+  // We check if the value exists at all.
+  // If it's "0", this check is true, and we use 0.
+  if (sinceValue !== undefined) {
+    sinceId = Number(sinceValue);
+  } else {
+    sinceId = -1;
+  }
+
+  const messagesSinceId = messages.filter((message) => message.id > sinceId);
+
+  res.send(messagesSinceId);
 });
 
 // Start the server
