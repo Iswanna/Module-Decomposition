@@ -1,6 +1,6 @@
 async function getAllMessages() {
   try {
-    const response = await fetch("http://localhost:3000/messages");
+    const response = await fetch("https://iswanna-chat-app-backend.onrender.com/messages");
 
     const data = await response.json();
 
@@ -33,7 +33,7 @@ formElement.addEventListener("submit", async (event) => {
   const messageValue = messageElement.value;
 
   // Send the data
-  const response = await fetch("http://localhost:3000/messages", {
+  const response = await fetch("https://iswanna-chat-app-backend.onrender.com/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
