@@ -3,7 +3,7 @@ let lastIdSeen = -1;
 async function getAllMessages() {
   try {
     const response = await fetch(
-      `http://localhost:3000/messages?since=${lastIdSeen}`,
+      `https://iswanna-chat-app-backend.onrender.com/messages?since=${lastIdSeen}`,
     );
 
     const data = await response.json();
@@ -41,9 +41,12 @@ async function getAllMessages() {
         likeButton.textContent = "Like";
 
         likeButton.addEventListener("click", async () => {
-          await fetch(`http://localhost:3000/messages/${message.id}/like`, {
-            method: "POST",
-          });
+          await fetch(
+            `https://iswanna-chat-app-backend.onrender.com/messages/${message.id}/like`,
+            {
+              method: "POST",
+            },
+          );
         });
 
         // put it all together
@@ -76,16 +79,19 @@ formElement.addEventListener("submit", async (event) => {
 
   try {
     // Send the data
-    const response = await fetch("http://localhost:3000/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://iswanna-chat-app-backend.onrender.com/messages",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sender: senderValue,
+          text: messageValue,
+        }),
       },
-      body: JSON.stringify({
-        sender: senderValue,
-        text: messageValue,
-      }),
-    });
+    );
 
     if (response.ok) {
       // clear the sender and message input values
