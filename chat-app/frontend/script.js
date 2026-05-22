@@ -11,15 +11,53 @@ async function getAllMessages() {
     const messageContainer = document.getElementById("all-messages");
 
     data.forEach((message) => {
-      const newElement = document.createElement("div");
+      const elementId = "msg-" + message.id;
 
-      newElement.textContent = message.sender + ": " + message.text;
-      lastIdSeen = message.id;
-      messageContainer.appendChild(newElement);
+      const existingElement = document.getElementById(elementId);
+
+      if (existingElement) {
+        // find the specific span that hold the likes
+        const likeSpan = document.getElementById("likes-count-" + message.id);
+
+        // update only that span
+        if (likeSpan) {
+          likeSpan.textContent = `(${message.likes} Likes) `;
+        }
+      } else {
+        const newElement = document.createElement("div");
+        newElement.id = "msg-" + message.id;
+
+        // layer 1: the text
+        const textSpan = document.createElement("span");
+        textSpan.textContent = `${message.sender}: ${message.text} `;
+
+        //Layer 2: the counter (this is the one we will update later)
+        const likeSpan = document.createElement("span");
+        likeSpan.id = "likes-count-" + message.id;
+        likeSpan.textContent = `(${message.likes} Likes) `;
+
+        // Layer 3: the button
+        const likeButton = document.createElement("button");
+        likeButton.textContent = "Like";
+
+        likeButton.addEventListener("click", async () => {
+          await fetch(`http://localhost:3000/messages/${message.id}/like`, {
+            method: "POST",
+          });
+        });
+
+        // put it all together
+        newElement.appendChild(textSpan);
+        newElement.appendChild(likeSpan);
+        newElement.appendChild(likeButton);
+        messageContainer.appendChild(newElement);
+
+        lastIdSeen = message.id;
+      }
     });
-    setTimeout(getAllMessages, 5000);
+    setTimeout(getAllMessages, 0);
   } catch (error) {
-    setTimeout(getAllMessages, 5000);
+    setTimeout(getAllMessages, 0);
     console.error("Error fetching messages:", error);
   }
 }
