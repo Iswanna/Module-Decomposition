@@ -33,7 +33,16 @@ app.post("/messages", (req, res) => {
   // Add the new message to the messages array (the storage)
   messages.push(newMessage);
 
-  // Send back a success status and the message (the response)
+  // long polling logic
+  while (callBacksForNewMessages.length > 0) {
+    // take the last function out the array
+    const callback = callBacksForNewMessages.pop();
+
+    // run that function using the newMessage as argument
+    callback([newMessage]);
+  }
+
+  // Finally, respond to the person who actually sent the POST request
   res.status(201).send(newMessage);
 });
 app.get("/messages", (req, res) => {

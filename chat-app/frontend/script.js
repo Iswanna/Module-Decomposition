@@ -3,7 +3,7 @@ let lastIdSeen = -1;
 async function getAllMessages() {
   try {
     const response = await fetch(
-      `https://iswanna-chat-app-backend.onrender.com/messages?since=${lastIdSeen}`,
+      `http://localhost:3000/messages?since=${lastIdSeen}`,
     );
 
     const data = await response.json();
@@ -38,24 +38,18 @@ formElement.addEventListener("submit", async (event) => {
 
   try {
     // Send the data
-    const response = await fetch(
-      "https://iswanna-chat-app-backend.onrender.com/messages",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sender: senderValue,
-          text: messageValue,
-        }),
+    const response = await fetch("http://localhost:3000/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        sender: senderValue,
+        text: messageValue,
+      }),
+    });
 
     if (response.ok) {
-      // refresh the list of messages
-      getAllMessages();
-
       // clear the sender and message input values
       senderElement.value = "";
       messageElement.value = "";
