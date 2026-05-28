@@ -43,12 +43,9 @@ async function getAllMessages() {
         likeButton.textContent = "Like";
 
         likeButton.addEventListener("click", async () => {
-          await fetch(
-            `${API_BASE_URL}/messages/${message.id}/like`,
-            {
-              method: "POST",
-            },
-          );
+          await fetch(`${API_BASE_URL}/messages/${message.id}/like`, {
+            method: "POST",
+          });
         });
 
         // put it all together
@@ -89,19 +86,16 @@ formElement.addEventListener("submit", async (event) => {
 
   try {
     // Send the data
-    const response = await fetch(
-      `${API_BASE_URL}/messages`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sender: senderValue,
-          text: messageValue,
-        }),
+    const response = await fetch(`${API_BASE_URL}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        sender: senderValue,
+        text: messageValue,
+      }),
+    });
 
     if (response.ok) {
       // clear the sender and message input values
