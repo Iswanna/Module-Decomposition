@@ -1,9 +1,11 @@
+const API_BASE_URL = "${API_BASE_URL}";
+
 let lastIdSeen = -1;
 
 async function getAllMessages() {
   try {
     const response = await fetch(
-      `https://iswanna-chat-app-backend.hosting.codeyourfuture.io/messages?since=${lastIdSeen}`,
+      `${API_BASE_URL}/messages?since=${lastIdSeen}`,
     );
 
     const data = await response.json();
@@ -42,7 +44,7 @@ async function getAllMessages() {
 
         likeButton.addEventListener("click", async () => {
           await fetch(
-            `https://iswanna-chat-app-backend.hosting.codeyourfuture.io/messages/${message.id}/like`,
+            `${API_BASE_URL}/messages/${message.id}/like`,
             {
               method: "POST",
             },
@@ -88,7 +90,7 @@ formElement.addEventListener("submit", async (event) => {
   try {
     // Send the data
     const response = await fetch(
-      "https://iswanna-chat-app-backend.hosting.codeyourfuture.io/messages",
+      `${API_BASE_URL}/messages`,
       {
         method: "POST",
         headers: {
