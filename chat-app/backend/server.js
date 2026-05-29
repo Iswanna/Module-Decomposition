@@ -5,7 +5,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const messages = [];
-const callBacksForNewMessages = [];
+let callBacksForNewMessages = {};
 
 // Enable CORS for all routes
 app.use(cors());
@@ -43,12 +43,12 @@ app.post("/messages", (req, res) => {
   messages.push(newMessage);
 
   // long polling logic
-  while (callBacksForNewMessages.length > 0) {
-    // take the last function out the array
-    const callback = callBacksForNewMessages.pop();
+  const waitingCallbacks = Object.values(callBacksForNewMessages);
+  if (waitingCallbacks.length > 0) {
+    waitingCallbacks.forEach((eachClient) => eachClient([newMessage]));
 
-    // run that function using the newMessage as argument
-    callback([newMessage]);
+    // SInce the waiting room still has all the clients I just sent responses to, I need to manually delete them
+    callBacksForNewMessages = {};
   }
 
   // Finally, respond to the person who actually sent the POST request
@@ -69,7 +69,18 @@ app.get("/messages", (req, res) => {
   const messagesSinceId = messages.filter((message) => message.id > sinceId);
 
   if (messagesSinceId.length === 0) {
-    callBacksForNewMessages.push((value) => res.send(value));
+    const clientId = req.query.clientId;
+
+    if (!clientId) {
+      return res.send([]);
+    }
+    callBacksForNewMessages[clientId] = (value) => {
+      try {
+        res.send(value);
+      } catch (e) {
+        delete callBacksForNewMessages[clientId];
+      }
+    };
   } else {
     res.send(messagesSinceId);
   }
@@ -86,18 +97,23 @@ app.post("/messages/:id/like", (req, res) => {
     (message) => message.id === idAsNumber,
   );
 
+  if (!messageWithIdAsNumber) {
+    return res.status(404).send("Message not found");
+  }
   messageWithIdAsNumber.likes += 1;
 
-  if (messageWithIdAsNumber) {
-    while (callBacksForNewMessages.length > 0) {
-      const callback = callBacksForNewMessages.pop();
+  // Get a snapshot list of all the clients' callback in the waiting room (Array)
+  const waitingCallbacks = Object.values(callBacksForNewMessages);
 
-      callback([messageWithIdAsNumber]);
-    }
-    res.status(200).send(messageWithIdAsNumber);
-  } else {
-    res.status(404).send("Message not found");
+  if (waitingCallbacks.length > 0) {
+    waitingCallbacks.forEach((eachClient) => {
+      eachClient([messageWithIdAsNumber]);
+    });
+
+    // clear the waiting room
+    callBacksForNewMessages = {};
   }
+  res.status(200).send(messageWithIdAsNumber);
 });
 
 // Start the server
