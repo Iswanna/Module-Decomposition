@@ -93,9 +93,7 @@ app.post("/messages/:id/like", (req, res) => {
   //convert to number
   const idAsNumber = Number(idFromUrl);
 
-  const messageWithIdAsNumber = messages.find(
-    (message) => message.id === idAsNumber,
-  );
+  const messageWithIdAsNumber = messages[idAsNumber];
 
   if (!messageWithIdAsNumber) {
     return res.status(404).send("Message not found");
@@ -107,8 +105,8 @@ app.post("/messages/:id/like", (req, res) => {
 
   const dataToSendToClient = {
     id: messageWithIdAsNumber.id,
-    likes: messageWithIdAsNumber.likes
-  }
+    likes: messageWithIdAsNumber.likes,
+  };
 
   if (waitingCallbacks.length > 0) {
     waitingCallbacks.forEach((eachClient) => {
