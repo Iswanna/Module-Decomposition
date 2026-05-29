@@ -105,15 +105,20 @@ app.post("/messages/:id/like", (req, res) => {
   // Get a snapshot list of all the clients' callback in the waiting room (Array)
   const waitingCallbacks = Object.values(callBacksForNewMessages);
 
+  const dataToSendToClient = {
+    id: messageWithIdAsNumber.id,
+    likes: messageWithIdAsNumber.likes
+  }
+
   if (waitingCallbacks.length > 0) {
     waitingCallbacks.forEach((eachClient) => {
-      eachClient([messageWithIdAsNumber]);
+      eachClient([dataToSendToClient]);
     });
 
     // clear the waiting room
     callBacksForNewMessages = {};
   }
-  res.status(200).send(messageWithIdAsNumber);
+  res.status(200).send(dataToSendToClient);
 });
 
 // Start the server
