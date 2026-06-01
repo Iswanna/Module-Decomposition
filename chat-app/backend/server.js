@@ -5,7 +5,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const messages = [];
-let callBacksForNewMessages = {};
+const callBacksForNewMessages = [];
 
 // Enable CORS for all routes
 app.use(cors());
@@ -43,12 +43,10 @@ app.post("/messages", (req, res) => {
   messages.push(newMessage);
 
   // long polling logic
-  const waitingCallbacks = Object.values(callBacksForNewMessages);
-  if (waitingCallbacks.length > 0) {
-    waitingCallbacks.forEach((eachClient) => eachClient([newMessage]));
+  while (callBacksForNewMessages.length > 0) {
+    const callBack = callBacksForNewMessages.pop();
 
-    // SInce the waiting room still has all the clients I just sent responses to, I need to manually delete them
-    callBacksForNewMessages = {};
+    callBack([newMessage]);
   }
 
   // Finally, respond to the person who actually sent the POST request
@@ -69,18 +67,7 @@ app.get("/messages", (req, res) => {
   const messagesSinceId = messages.filter((message) => message.id > sinceId);
 
   if (messagesSinceId.length === 0) {
-    const clientId = req.query.clientId;
-
-    if (!clientId) {
-      return res.send([]);
-    }
-    callBacksForNewMessages[clientId] = (value) => {
-      try {
-        res.send(value);
-      } catch (e) {
-        delete callBacksForNewMessages[clientId];
-      }
-    };
+    callBacksForNewMessages.push((value) => res.send(value));
   } else {
     res.send(messagesSinceId);
   }
@@ -100,21 +87,15 @@ app.post("/messages/:id/like", (req, res) => {
   }
   messageWithIdAsNumber.likes += 1;
 
-  // Get a snapshot list of all the clients' callback in the waiting room (Array)
-  const waitingCallbacks = Object.values(callBacksForNewMessages);
-
   const dataToSendToClient = {
     id: messageWithIdAsNumber.id,
     likes: messageWithIdAsNumber.likes,
   };
 
-  if (waitingCallbacks.length > 0) {
-    waitingCallbacks.forEach((eachClient) => {
-      eachClient([dataToSendToClient]);
-    });
+  while (callBacksForNewMessages.length > 0) {
+    const callBack = callBacksForNewMessages.pop();
 
-    // clear the waiting room
-    callBacksForNewMessages = {};
+    callBack([dataToSendToClient]);
   }
   res.status(200).send(dataToSendToClient);
 });
