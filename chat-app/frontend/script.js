@@ -6,8 +6,7 @@ let lastIdSeen = -1;
 async function getAllMessages() {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/messages?since=${lastIdSeen}`,
-    );
+      `${API_BASE_URL}/messages?since=${lastIdSeen}`);
 
     // check if the response is not ok
     if (!response.ok) {
