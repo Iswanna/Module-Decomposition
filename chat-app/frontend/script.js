@@ -19,11 +19,10 @@ async function getAllMessages() {
     const data = await response.json();
 
     renderMessages(data);
-
-    setTimeout(getAllMessages, 0);
   } catch (error) {
-    setTimeout(getAllMessages, 0);
     console.error("Error fetching messages:", error);
+  } finally {
+    setTimeout(getAllMessages, 0);
   }
 }
 
