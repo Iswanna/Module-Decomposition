@@ -64,7 +64,7 @@ app.post("/", usernameMiddleware, arrayMiddleware, (req, res) => {
 
   const messageJoined = req.body.join(",");
 
-  const word = MessageCount <= 1 ? "subject" : "subjects";
+  const word = MessageCount === 1 ? "subject" : "subjects";
 
   if (MessageCount > 0) {
     res.send(
