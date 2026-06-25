@@ -17,25 +17,26 @@ const usernameMiddleware = (req, res, next) => {
 };
 
 const arrayMiddleware = (req, res, next) => {
-  const bodyBytes = [];
+  const chunks = [];
 
   // Every time a piece of data arrives, we put it in our list
   req.on("data", (chunk) => {
-    bodyBytes.push(...chunk);
+    chunks.push(chunk);
   });
 
   // When the whole message has arrived, we process it
   req.on("end", () => {
-    const bodyString = String.fromCharCode(...bodyBytes);
+    const bodyString = Buffer.concat(chunks).toString();
 
     let bodyObject;
     try {
       bodyObject = JSON.parse(bodyString);
+      
     } catch (error) {
       res.status(400).send("Invalid JSON");
       return;
     }
-
+    
     if (
       Array.isArray(bodyObject) &&
       bodyObject.every((item) => typeof item === "string")
