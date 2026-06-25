@@ -26,7 +26,7 @@ const validateArray = (req, res, next) => {
   ) {
     next();
   } else {
-    res.status(400).send("Error message");
+    res.status(400).send("Invalid request body. Expected a JSON array containing only strings.");
   }
 };
 
